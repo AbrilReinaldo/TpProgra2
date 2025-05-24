@@ -3,79 +3,113 @@ package tp;
 import java.util.HashMap;
 import java.util.List;
 
+import tp.Funcion;
+import tp.Entrada;
+import tp.Espectaculo;
+import tp.Estadio;
+import tp.Miniestadio;
+import tp.Sede;
+import tp.Teatro;
+import tp.Usuario;
+
+
+//Cada clase es responsable de asegurar la integridad de sus datos.
+//Teniendo eso en cuenta, las validaciones las debería hacer la clase
+//y si pasan datos inválidos en el constructor no se debe crear una instancia de esa clase (lanza excepción)
+
+
+
 public class Ticketek implements ITicketek {
+
 	HashMap <String,Usuario> Usuarios = new HashMap<>();
-	HashMap <String,Espectaculo> Espectaculos = new HashMap<>();
 	HashMap <String,Sede> Sedes = new HashMap<>();
-	
+	HashMap<String, Espectaculo> Espectaculos = new HashMap<>();
+	HashMap<String, Entrada> Entradas = new HashMap<>();
     
 	@Override
-	public void registrarSede(String nombre, String direccion, int capacidadMaxima) {
-		if(Sedes.containsKey(nombre)) {
-			throw new RuntimeException("El estadio ya esta registrado");
-		}
-		Sedes.put(nombre, new Estadio(nombre,direccion,capacidadMaxima));
-	}
-    /**
-     * 1) Registra las sedes con asientos y sin puestos de venta, teatros.
-     * Estos reciben la informacion de los sectores como parámetros.
-     * 
-     * Si el nombre ya está registrado, se debe lanzar una excepcion.
-     * Si algun dato no es aceptable, se debe lanzar una excepcion.
+    public void registrarSede(String nombre, String direccion, int capacidadMaxima) {
+		if(Sedes.containsKey(nombre)) {throw new RuntimeException("Estadio ya registrado");}
+		Sedes.put(nombre,new Estadio(nombre,direccion,capacidadMaxima));
+    }
+    
 
-     */
 	@Override
-	public void registrarSede(String nombre, String direccion, int capacidadMaxima, int asientosPorFila, String[] sectores, int[] capacidad, int[] porcentajeAdicional) {
-		if(Sedes.containsKey(nombre)) {
-			throw new RuntimeException("El teatro ya esta registrado");
-		}
-		Sedes.put(nombre, new Teatro(nombre,direccion,capacidadMaxima,asientosPorFila,sectores,capacidad,porcentajeAdicional));
-
+	public void registrarSede(String nombre, String direccion, int capacidadMaxima, int asientosPorFila,
+			String[] sectores, int[] capacidad, int[] porcentajeAdicional) {
+		if(Sedes.containsKey(nombre)) {throw new RuntimeException("Teatro ya registrado");}
+		Sedes.put(nombre,new Teatro(nombre,direccion,capacidadMaxima,asientosPorFila,sectores,capacidad,porcentajeAdicional));
+		
 	}
 
 	@Override
 	public void registrarSede(String nombre, String direccion, int capacidadMaxima, int asientosPorFila,
 			int cantidadPuestos, double precioConsumicion, String[] sectores, int[] capacidad,
 			int[] porcentajeAdicional) {
-		// TODO Auto-generated method stub
-
+		if(Sedes.containsKey(nombre)) {throw new RuntimeException("Miniestadio ya registrado");}
+		Sedes.put(nombre,new Miniestadio(nombre,direccion, capacidadMaxima, asientosPorFila,
+				 cantidadPuestos,  precioConsumicion, sectores,capacidad,porcentajeAdicional));
+		
 	}
+
 
 	@Override
 	public void registrarUsuario(String email, String nombre, String apellido, String contrasenia) {
-		// TODO Auto-generated method stub
-		if(Usuarios.containsKey(email)) {
-			throw new RuntimeException("El teatro ya esta registrado");
-		}
-		Usuarios.put(email, new Usuario( email,nombre,apellido,contrasenia));
-
+		if(Usuarios.containsKey(email)) {throw new RuntimeException("El email ya ha sido usado");}
+		Usuarios.put(email,new Usuario(email,nombre,apellido,contrasenia));
+    
 	}
-
-
 
 	@Override
 	public void registrarEspectaculo(String nombre) {
-		// TODO Auto-generated method stub
-
-	}
-
+    if (Espectaculos.containsKey(nombre)) {
+        throw new RuntimeException("El espectáculo ya está registrado");
+    }
+    Espectaculos.put(nombre, new Espectaculo(nombre)); 
+}
+	
 	@Override
 	public void agregarFuncion(String nombreEspectaculo, String fecha, String sede, double precioBase) {
-		// TODO Auto-generated method stub
-
-	}
-
+		if(!Espectaculos.containsKey(nombreEspectaculo) && !Sedes.containsKey(sede)) {
+			throw new RuntimeException("El espectaculo o la sede no estan registrados"); //////////////////////////////////////////////REVISAR		
+		}
+		Espectaculos.get(nombreEspectaculo).agregarFuncion(new Funcion(nombreEspectaculo,fecha,sede,precioBase), fecha);
+		}
+		
+    /**
+     * 4) Vende una o varias entradas a un usuario para funciones
+     * en sedes no numeradas
+     * 
+     * Devuelve una lista con las entradas vendidas (Ver interfaz IEntrada).
+     *  
+     * Se debe lanzar una excepcion si:
+     *  - Si la sede de la funcion está numerada
+     *  - si el usuario no está registrado
+     *  - si el espectaculo no está registrado
+     *  - si la contraseña no es valida
+     *  - etc...
+     * 
+     * @return
+     */
+	//vender entrada estadio
 	@Override
 	public List<IEntrada> venderEntrada(String nombreEspectaculo, String fecha, String email, String contrasenia,
-			int cantidadEntradas) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+			//int cantidadEntradas) {
+		//HashMap<String, Entrada> entradasUsuario = new HashMap<>();
+		
+		//exception
+		//return entradasUsuario;
 
+	}
+//CODIGO DE NICO................................................................................................................
 	@Override
 	public List<IEntrada> venderEntrada(String nombreEspectaculo, String fecha, String email, String contrasenia,
 			String sector, int[] asientos) {
 		// TODO Auto-generated method stub
+		if(!Espectaculos.containsKey(nombreEspectaculo)) {throw new RuntimeException("El espectaculo no ha sido registrado");}
+		if(!Usuarios.containsKey(email)) {throw new RuntimeException("El usuario no ha sido registrado");}
+		Usuario u = Usuarios.get(email);
+		if (!u.validacionContrasenia(contrasenia)) throw new RuntimeException("Contra invalida");
+		
 		return null;
 	}
 
@@ -102,10 +136,29 @@ public class Ticketek implements ITicketek {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+    
+    /**
+     * 8) Cancela una entrada comprada por el usuario. Se debe resolver en O(1)
+     * 
+     * Al cancelarla, el lugar asignado deberá volver a estar disponible.
+     * 
+     * Se deben validar los datos y lanzar una excepcion en caso de que 
+     * algo sea invalido.
+     * 
+     * Si los datos son validos pero la fecha de la entrada ya pasó,
+     * se debe devolver falso
+     * 
+     * Ver interfaz IEntrada.
+     * 
+     * 
+     * @param Entrada
+     * @param contrasenia
+     * @return
+     *  
+     */
 	@Override
 	public boolean anularEntrada(IEntrada entrada, String contrasenia) {
-		// TODO Auto-generated method stub
+	
 		return false;
 	}
 

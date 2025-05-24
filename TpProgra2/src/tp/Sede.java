@@ -1,18 +1,25 @@
 package tp;
 
 public abstract class Sede {
-	protected int capacidadMaxima;
-	protected String direccion;
 	protected String nombre;
-	protected String tipo;
-	public Sede(int capacidadMaxima, String direccion, String nombre, String tipo) {
+	protected String direccion; 
+	protected int capacidadMaxima;
+	
+ 
+	int asientosPorFila; 
+	int cantidadPuestos; 
+	double precioConsumicion; 
+	String[] sectores;
+	int[] capacidad;
+	int[] porcentajeAdicional;
+	
+	public Sede(String nombre, String direccion, int capacidadMaxima) {
 		super();
-		this.capacidadMaxima = capacidadMaxima;
-		this.direccion = direccion;
 		this.nombre = nombre;
-		this.tipo = tipo;
+		this.direccion = direccion;
+		this.capacidadMaxima = capacidadMaxima;
 	}
-	
-	
+
+
 
 }
